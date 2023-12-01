@@ -1,0 +1,17 @@
+package types
+
+type MultiConfig struct {
+	Distro  string       `yaml:"distro" json:"distro"`
+	Version string       `yaml:"version" json:"version"`
+	Arch    string       `yaml:"arch" json:"arch"`
+	Airgap  bool         `yaml:"airgap" json:"airgap"`
+	Nodes   []NodeConfig `yaml:"nodes" json:"nodes"`
+}
+
+type NodeConfig struct {
+	Address    string `yaml:"address" json:"address"`
+	User       string `yaml:"user" json:"user"`
+	Role       string `yaml:"role" json:"role"`
+	SshKeyPath string `yaml:"ssh_key_path" json:"ssh_key_path" `
+	Config     string `yaml:"config" json:"config"`
+}

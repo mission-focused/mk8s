@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 Brandt Keller brandtkeller@gmail.com
+Copyright © 2023 MissionFocusedDevelopers
 */
 package cmd
 
