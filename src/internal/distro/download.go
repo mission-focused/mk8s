@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -15,7 +16,7 @@ func DownloadArtifacts(distro, arch, version string) error {
 
 	switch distro {
 	case "rke2":
-		return downloadRKE2()
+		return downloadRKE2(arch, version)
 	// case "k3s":
 	// 	return downloadK3s()
 	default:
@@ -24,10 +25,12 @@ func DownloadArtifacts(distro, arch, version string) error {
 
 }
 
-func downloadRKE2() error {
+func downloadRKE2(arch, version string) error {
 
+	escapedVer := strings.Replace(version, "+", "%2B", -1)
+	baseUrl := "https://github.com/rancher/rke2/releases/download/" + escapedVer + "/"
 	var artifacts = []string{
-		"https://github.com/rancher/rke2/releases/download/v1.28.3%2Brke2r2/rke2.linux-amd64.tar.gz",
+		baseUrl + "rke2.linux-" + arch + ".tar.gz",
 	}
 
 	for _, artifact := range artifacts {
