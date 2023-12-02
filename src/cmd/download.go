@@ -6,6 +6,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/brandtkeller/mk8s/src/internal/common"
+	"github.com/brandtkeller/mk8s/src/internal/distro"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +18,22 @@ var downloadCmd = &cobra.Command{
 	Long:  `download artifacts for kubernetes cluster installation`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("download called")
+
+		path := args[0]
+		// Read the manifest file - should be the first argument
+		config, err := common.ConfigFromPath(path)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(config.Distro)
+
+		// Download the artifacts
+		err = distro.DownloadArtifacts(config.Distro, config.Arch, config.Version)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	},
 }

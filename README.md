@@ -21,7 +21,7 @@ Concurrency
 
 ## Build Phases
 
-Phase 1: manifest mockup
+Phase 1: manifest mockup - DONE
 Phase 2: Pick a single distro and build a download command / implementation
 Phase 3: Write functionality to copy artifacts to target
 Phase 4: Write functionality to bootstrap nodes
