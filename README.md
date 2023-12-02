@@ -26,3 +26,12 @@ Phase 2: Pick a single distro and build a download command / implementation
 Phase 3: Write functionality to copy artifacts to target
 Phase 4: Write functionality to bootstrap nodes
 Phase 5: Write functionality to install Kubernetes and check for health
+
+## Potential Capabilities
+- Automated Artifact download
+  - Ability to pass in alternative download for primary artifacts
+    - Add `artifacts` key to the manifest
+  - Ability to check for the existence of the artifacts
+    - During download to use local instead of re-downloading
+    - `mk8s tools check-artifacts`
+  - SHA validation of artifacts

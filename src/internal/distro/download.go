@@ -7,16 +7,17 @@ import (
 	"os"
 	"strings"
 
+	"github.com/brandtkeller/mk8s/src/types"
 	"github.com/cheggaaa/pb/v3"
 )
 
-func DownloadArtifacts(distro, arch, version string) error {
-	// Purpose would be to download the artfiacts to the current directory
+func DownloadArtifacts(distro, arch, version string, artifacts map[string]types.Artifact) error {
+	// Purpose would be to download the artifacts to the current directory
 	// no return besides error required
 
 	switch distro {
 	case "rke2":
-		return downloadRKE2(arch, version)
+		return downloadRKE2(arch, version, artifacts)
 	// case "k3s":
 	// 	return downloadK3s()
 	default:
@@ -25,19 +26,33 @@ func DownloadArtifacts(distro, arch, version string) error {
 
 }
 
-func downloadRKE2(arch, version string) error {
+func downloadRKE2(arch, version string, artifacts map[string]types.Artifact) error {
 
-	escapedVer := strings.Replace(version, "+", "%2B", -1)
-	baseUrl := "https://github.com/rancher/rke2/releases/download/" + escapedVer + "/"
-	var artifacts = []string{
-		baseUrl + "rke2.linux-" + arch + ".tar.gz",
+	allArtifacts, err := addDefaultArtifacts("rke2", arch, version, artifacts)
+	if err != nil {
+		return err
 	}
 
-	for _, artifact := range artifacts {
-		err := DownloadFile(artifact, "rke2.linux-amd64.tar.gz")
+	if exist, _ := dirOrFileExists("artifacts/"); !exist {
+		// create artifacts directory if it doesn't exist
+		err := os.Mkdir("artifacts/", 0755)
 		if err != nil {
 			return err
 		}
+	}
+
+	for id, artifact := range allArtifacts {
+
+		if exist, _ := dirOrFileExists("artifacts/" + artifact.Name); !exist {
+			fmt.Println("Downloading", id)
+			err := DownloadFile(artifact.URL, "artifacts/"+artifact.Name)
+			if err != nil {
+				return err
+			}
+		} else {
+			fmt.Println("Artifact", id, "already exists")
+		}
+
 	}
 
 	return nil
@@ -47,6 +62,64 @@ func downloadRKE2(arch, version string) error {
 
 // 	return nil
 // }
+
+func addDefaultArtifacts(distro, arch, version string, artifacts map[string]types.Artifact) (map[string]types.Artifact, error) {
+
+	switch distro {
+	case "rke2":
+		escapedVer := strings.Replace(version, "+", "%2B", -1)
+		baseUrl := "https://github.com/rancher/rke2/releases/download/" + escapedVer + "/"
+
+		if len(artifacts) == 0 {
+			artifacts = make(map[string]types.Artifact)
+		}
+
+		if _, ok := artifacts["checksums"]; !ok {
+			// Images key does not exist
+			artifacts["checksums"] = types.Artifact{
+				Name: "sha256sum-" + arch + ".txt",
+				URL:  baseUrl + "sha256sum-" + arch + ".txt",
+			}
+		}
+
+		if _, ok := artifacts["binary"]; !ok {
+			// Images key does not exist
+			artifacts["binary"] = types.Artifact{
+				Name: "rke2.linux-" + arch + ".tar.gz",
+				URL:  baseUrl + "rke2.linux-" + arch + ".tar.gz",
+			}
+		}
+
+		if _, ok := artifacts["images"]; !ok {
+			// Images key does not exist
+			artifacts["images"] = types.Artifact{
+				Name: "rke2-images.linux-" + arch + ".tar.zst",
+				URL:  baseUrl + "rke2-images.linux-" + arch + ".tar.zst",
+			}
+		}
+
+		return artifacts, nil
+	default:
+		return artifacts, fmt.Errorf("unsupported distro: %s", distro)
+	}
+
+}
+
+// Check if a file or directory exists
+func dirOrFileExists(path string) (bool, error) {
+	// Stat returns file information. If there is an error, it will be of type *PathError.
+	// Check if the error is nil to determine if the file exists.
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	} else if os.IsNotExist(err) {
+		// File does not exist
+		return false, nil
+	} else {
+		// Some other error occurred (permission issues, etc.)
+		return false, err
+	}
+}
 
 // ProgressBarWriter is a custom writer that wraps pb.ProgressBar.
 type ProgressBarWriter struct {

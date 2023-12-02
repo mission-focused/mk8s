@@ -29,7 +29,7 @@ var downloadCmd = &cobra.Command{
 		fmt.Println(config.Distro)
 
 		// Download the artifacts
-		err = distro.DownloadArtifacts(config.Distro, config.Arch, config.Version)
+		err = distro.DownloadArtifacts(config.Distro, config.Arch, config.Version, config.Artifacts)
 		if err != nil {
 			return err
 		}

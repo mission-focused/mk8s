@@ -4,7 +4,8 @@
 distro: rke2
 version: v1.28.3+rke2r2
 arch: amd64
-airgap: true
+airgap: true # this is assumed for now
+# artifacts:
 
 ## Individual Node Configuration
 nodes:
@@ -18,15 +19,13 @@ nodes:
       write-kubeconfig-mode: "0644"
 
       tls-san:
-        - k8s-home-1
-        - k8s-home-1.kellerhome.us
-        - home
-        - home.kellerhome.us
+        - k8s-test-1
+        - k8s-test-1.test.us
+        - test
+        - test.test.us
       disable:
         - rke2-ingress-nginx
       disable-cloud-controller: true
       token: my-shared-secret
-      node-label:
-        - "home=zwave"
       node-taint:
         - "CriticalAddonsOnly=true:NoExecute"
