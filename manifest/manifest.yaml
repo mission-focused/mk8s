@@ -15,7 +15,7 @@ nodes:
     ssh_key_path: ~/.ssh/id_rsa
     ## Pass config file wholesale
     config: |
-      server: https://192.168.0.42:9345
+      # server: https://192.168.0.42:9345
       write-kubeconfig-mode: "0644"
 
       tls-san:

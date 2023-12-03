@@ -7,14 +7,15 @@ import (
 	"fmt"
 
 	"github.com/brandtkeller/mk8s/src/internal/common"
+	"github.com/brandtkeller/mk8s/src/internal/distro"
 	"github.com/spf13/cobra"
 )
 
 // deployCmd represents the deploy command
-var deployCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "deploy a kubernetes cluster",
-	Long:  `deploy a kubernetes cluster`,
+var installCmd = &cobra.Command{
+	Use:   "install",
+	Short: "install a kubernetes cluster",
+	Long:  `install a kubernetes cluster`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("deploy called")
 
@@ -24,17 +25,27 @@ var deployCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(config)
 		// Perform validation of the configuration
 		// This is likely a per-distribution function
+
+		// Download artifacts
+		err = distro.DownloadArtifacts(config)
+		if err != nil {
+			return err
+		}
+
+		// Install
+		err = distro.Install(config)
+		if err != nil {
+			return err
+		}
 
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(deployCmd)
+	rootCmd.AddCommand(installCmd)
 
 	// deployCmd.PersistentFlags().String("foo", "", "A help for foo")
 	// deployCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

@@ -11,17 +11,17 @@ import (
 	"github.com/cheggaaa/pb/v3"
 )
 
-func DownloadArtifacts(distro, arch, version string, artifacts map[string]types.Artifact) error {
+func DownloadArtifacts(config types.MultiConfig) error {
 	// Purpose would be to download the artifacts to the current directory
 	// no return besides error required
 
-	switch distro {
+	switch config.Distro {
 	case "rke2":
-		return downloadRKE2(arch, version, artifacts)
+		return downloadRKE2(config.Arch, config.Version, config.Artifacts)
 	// case "k3s":
 	// 	return downloadK3s()
 	default:
-		return fmt.Errorf("unsupported distro %s", distro)
+		return fmt.Errorf("unsupported distro %s", config.Distro)
 	}
 
 }
@@ -95,6 +95,14 @@ func addDefaultArtifacts(distro, arch, version string, artifacts map[string]type
 			artifacts["images"] = types.Artifact{
 				Name: "rke2-images.linux-" + arch + ".tar.zst",
 				URL:  baseUrl + "rke2-images.linux-" + arch + ".tar.zst",
+			}
+		}
+
+		if _, ok := artifacts["installScript"]; !ok {
+			// Images key does not exist
+			artifacts["installScript"] = types.Artifact{
+				Name: "install.sh",
+				URL:  "https://get.rke2.io",
 			}
 		}
 
