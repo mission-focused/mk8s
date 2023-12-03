@@ -35,3 +35,9 @@ Phase 5: Write functionality to install Kubernetes and check for health
     - During download to use local instead of re-downloading
     - `mk8s tools check-artifacts`
   - SHA validation of artifacts
+    - RKE2/K3S
+      - Do something with the shasum file
+- Extensibility
+  - Handle race conditions for primary node when installing fresh cluster
+  - Handle joining standard server nodes to existing primary
+  - Handle joining agents to an established controlplane

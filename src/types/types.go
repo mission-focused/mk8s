@@ -13,6 +13,7 @@ type NodeConfig struct {
 	Address    string `yaml:"address" json:"address"`
 	User       string `yaml:"user" json:"user"`
 	Role       string `yaml:"role" json:"role"`
+	Primary    bool   `yaml:"primary" json:"primary"`
 	SshKeyPath string `yaml:"ssh_key_path" json:"ssh_key_path" `
 	Config     string `yaml:"config" json:"config"`
 }
