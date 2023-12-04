@@ -1,13 +1,20 @@
 # mk8s
-Declarative Multi-Node Kubernetes Installer
+mk8s is a lightweight and portable tool for installing Kubernetes across many nodes with a focus on air-gap support. It uses a declarative manifest to define cluster nodes and their roles. It uses local or SSH access to perform the bootstrap and execution of Kubernetes processes with the intent of being extensible and flexible. 
 
-**Note:** This is merely an experiment at this point in time. All of my work is solely done in the open. Please leave comments or issues if you have any. 
+**Note:** This is merely an experiment at this point in time. All of this work is solely done in the open. Please leave comments or issues if you have any. 
 
-## Purpose
-Declarative multi-node kubernetes installer. Given a declarative manifest - install kubernetes across many nodes (to include the node running the tool). Make this process idempotent and air gap friendly. Allows for abstractions of various Kubernetes distributions. 
+## Why?
+Orchestrating the installation of Kubernetes clusters - whether connected or disconnected - across many nodes is often left to the operator (hence why this project exists). Cloud and Hypervisors have understood workflows for deploying clusters - but bare-metal and disconnected environments are often more complicated. What if we could reduce the dependency down to networked compute (linux). 
 
-## Thoughts
-Why hasn't anyone built an orchestrator of this kind before? Something that can install kubernetes across many nodes from a single point without the mess of dependencies that is Ansible. 
+What if we could do this without the complexities of Ansible and have more granular capabilities and error handling to respond to events accordingly. Enter mk8s. 
+
+## Future Objectives
+- Concurrency
+  - Drive bootstrap to installation for many Kubernetes nodes simultaneously
+  - Reduce total time to High-availability 
+- Distro Support
+  - Start with RKE2
+  - Support K3s/Kubeadm in future builds
 
 ## Areas of Interest
 
@@ -19,10 +26,10 @@ Concurrency
   - On signal from primary server ready - initiate all server nodes k8s processes to join
   - On signal from server nodes healthy - initiate all agent nodes 
 
-## Build Phases
+## Initial Build Phases
 
-Phase 1: manifest mockup - DONE
-Phase 2: Pick a single distro and build a download command / implementation
+Phase 1: manifest mockup - Done
+Phase 2: Pick a single distro and build a download command - Done
 Phase 3: Write functionality to copy artifacts to target
 Phase 4: Write functionality to bootstrap nodes
 Phase 5: Write functionality to install Kubernetes and check for health
@@ -40,4 +47,7 @@ Phase 5: Write functionality to install Kubernetes and check for health
 - Extensibility
   - Handle race conditions for primary node when installing fresh cluster
   - Handle joining standard server nodes to existing primary
-  - Handle joining agents to an established controlplane
+  - Handle joining agents to an established control-plane
+
+- Error Handling
+  - Retry logic where applicable

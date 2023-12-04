@@ -13,6 +13,7 @@ nodes:
     user: ubuntu
     role: server
     primary: true
+    local: false
     ssh_key_path: ~/.ssh/id_rsa
     ## Pass config file wholesale
     config: |
@@ -33,6 +34,7 @@ nodes:
     user: ubuntu
     role: server
     primary: false
+    local: false
     ssh_key_path: ~/.ssh/id_rsa
     ## Pass config file wholesale
     config: |
@@ -54,6 +56,7 @@ nodes:
     user: ubuntu
     role: server
     primary: false
+    local: false
     ssh_key_path: ~/.ssh/id_rsa
     ## Pass config file wholesale
     config: |

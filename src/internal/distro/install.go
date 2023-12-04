@@ -13,15 +13,18 @@ func Install(config types.MultiConfig) error {
 		return err
 	}
 
-	// fmt.Println(nodeMap)
-	err = installRKE2(nodeMap)
-	if err != nil {
-		return err
+	switch config.Distro {
+	case "rke2":
+		err = installMultiRKE2(nodeMap)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("Distro %s not supported", config.Distro)
 	}
 
-	// NodeMap is now established, we can now begin installation based on the distro
-
 	return nil
+
 }
 
 // For future concurrency purposes and general mapping

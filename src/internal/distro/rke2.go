@@ -5,12 +5,21 @@ import "github.com/brandtkeller/mk8s/src/types"
 // TODO: maybe separate this to another package in the future
 
 // TODO: Here we can have more fun with concurrency in the future
-func installRKE2(nodes map[string][]types.NodeConfig) (err error) {
+func installMultiRKE2(nodes map[string][]types.NodeConfig) (err error) {
 
 	// Likely we want to establish some concurrency here in the future
 
 	// Prioritize installation on the primary node if identified
 	// TODO: future - then run the install on all other nodes simultaneously
+	if _, ok := nodes["primary"]; ok {
+		// There should always only be one primary
+		err = installRKE2(nodes["primary"][0])
+		if err != nil {
+			return err
+		}
+
+		// grab and alter the kubeconfig here for use immediately
+	}
 	// For all nodes:
 
 	//		copy the required artifacts to all nodes - check for existence first
@@ -24,6 +33,19 @@ func installRKE2(nodes map[string][]types.NodeConfig) (err error) {
 
 	//		Enable the rke2 service on the node
 	//		Start the rke2 service on the node
+
+	return nil
+}
+
+// Single node installation
+func installRKE2(node types.NodeConfig) error {
+
+	if !node.Local {
+		// remote installation - ssh required
+
+	} else {
+		// Local installation - no ssh required
+	}
 
 	return nil
 }
