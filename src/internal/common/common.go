@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/brandtkeller/mk8s/src/types"
 	"gopkg.in/yaml.v3"
@@ -33,10 +34,11 @@ func ConfigFromPath(path string) (types.MultiConfig, error) {
 
 // SSHConfig represents the configuration for connecting to an SSH server
 type SSHConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string // You can use a private key instead of a password for more security
+	Host       string
+	Port       int
+	User       string
+	Password   string // You can use a private key instead of a password for more security
+	PrivateKey string
 }
 
 // RunCommand executes the given command on the remote machine and returns the output
@@ -76,9 +78,9 @@ func RunCommand(sshConfig SSHConfig, command string) (string, error) {
 }
 
 // CopyFileWithSSH copies a file from source to destination using SFTP over SSH
-func CopyFileWithSSH(sshAddr, user, privateKeyPath, sourceFilePath, destFilePath string) error {
+func CopyFileWithSSH(sshConfig SSHConfig, sourceFilePath, destFilePath string) error {
 	// Read private key file
-	privateKey, err := os.ReadFile(privateKeyPath)
+	privateKey, err := os.ReadFile(sshConfig.PrivateKey)
 	if err != nil {
 		return err
 	}
@@ -91,14 +93,14 @@ func CopyFileWithSSH(sshAddr, user, privateKeyPath, sourceFilePath, destFilePath
 
 	// Connect to the SSH server
 	config := &ssh.ClientConfig{
-		User: user,
+		User: sshConfig.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	client, err := ssh.Dial("tcp", sshAddr, config)
+	client, err := ssh.Dial("tcp", sshConfig.Host+":"+strconv.Itoa(sshConfig.Port), config)
 	if err != nil {
 		return err
 	}

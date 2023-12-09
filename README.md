@@ -51,3 +51,7 @@ Phase 5: Write functionality to install Kubernetes and check for health
 
 - Error Handling
   - Retry logic where applicable
+
+## Where to start next
+- RKE2 download logic
+  - How to download the list of artifacts... 

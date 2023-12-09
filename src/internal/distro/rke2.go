@@ -1,6 +1,7 @@
 package distro
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/brandtkeller/mk8s/src/internal/common"
@@ -32,19 +33,7 @@ func installMultiRKE2(nodes map[string][]types.NodeConfig) (err error) {
 // Single node installation
 func installRKE2(node types.NodeConfig) error {
 
-	// 		Create local copy of the config file
-	ipString := strings.Replace(node.Address, ".", "-", -1)
-	fileName := "artifacts/" + ipString + "-config.yaml"
-
-	err := common.CreateConfigFile(node.Config, fileName)
-	if err != nil {
-		return err
-	}
-	//		Check for existence of artifacts on the remote node
-
-	//		create /etc/rancher/rke2/ directory on the node
-
-	// 		create the config file at /etc/rancher/rke2/config.yaml using the node config
+	//
 
 	//		Run the installation script
 	//		INSTALL_RKE2_ARTIFACT_PATH=/home/dev/rke2-artifacts INSTALL_RKE2_TYPE='agent' sh /home/dev/rke2-artifacts/install.sh"
@@ -54,8 +43,41 @@ func installRKE2(node types.NodeConfig) error {
 
 	if !node.Local {
 		// remote installation - ssh required
+		// 		Create local copy of the config file
+		ipString := strings.Replace(node.Address, ".", "-", -1)
+		fileName := "artifacts/" + ipString + "-config.yaml"
 
+		err := common.CreateConfigFile(node.Config, fileName)
+		if err != nil {
+			return err
+		}
+
+		// Create the sshconfig
+		sshconfig := common.SSHConfig{
+			Host:       node.Address,
+			Port:       22,
+			User:       node.User,
+			PrivateKey: node.SshKeyPath,
+		}
+
+		// create /etc/rancher/rke2/ directory on the node
+		output, err := common.RunCommand(sshconfig, "sudo mkdir -p /etc/rancher/rke2")
+		if err != nil {
+			return err
+		}
+		fmt.Println(output)
+
+		// create the config file at /etc/rancher/rke2/config.yaml using the node config
+		err = common.CopyFileWithSSH(sshconfig, fileName, "/etc/rancher/rke2/config.yaml")
+		if err != nil {
+			return err
+		}
+
+		// TODO: check for existence of files on the node
+		// For now (given local testing) - we'll copy them
 		// TODO: do we need to create a new ssh session for each command? Or can we reuse the same session?
+
+		// TODO: Start Here - copy all artifacts from artifacts directory besides config files.
 
 	} else {
 		// Local installation - no ssh required
