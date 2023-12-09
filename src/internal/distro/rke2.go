@@ -1,6 +1,11 @@
 package distro
 
-import "github.com/brandtkeller/mk8s/src/types"
+import (
+	"strings"
+
+	"github.com/brandtkeller/mk8s/src/internal/common"
+	"github.com/brandtkeller/mk8s/src/types"
+)
 
 // TODO: maybe separate this to another package in the future
 
@@ -20,9 +25,22 @@ func installMultiRKE2(nodes map[string][]types.NodeConfig) (err error) {
 
 		// grab and alter the kubeconfig here for use immediately
 	}
-	// For all nodes:
 
-	//		copy the required artifacts to all nodes - check for existence first
+	return nil
+}
+
+// Single node installation
+func installRKE2(node types.NodeConfig) error {
+
+	// 		Create local copy of the config file
+	ipString := strings.Replace(node.Address, ".", "-", -1)
+	fileName := "artifacts/" + ipString + "-config.yaml"
+
+	err := common.CreateConfigFile(node.Config, fileName)
+	if err != nil {
+		return err
+	}
+	//		Check for existence of artifacts on the remote node
 
 	//		create /etc/rancher/rke2/ directory on the node
 
@@ -34,14 +52,10 @@ func installMultiRKE2(nodes map[string][]types.NodeConfig) (err error) {
 	//		Enable the rke2 service on the node
 	//		Start the rke2 service on the node
 
-	return nil
-}
-
-// Single node installation
-func installRKE2(node types.NodeConfig) error {
-
 	if !node.Local {
 		// remote installation - ssh required
+
+		// TODO: do we need to create a new ssh session for each command? Or can we reuse the same session?
 
 	} else {
 		// Local installation - no ssh required

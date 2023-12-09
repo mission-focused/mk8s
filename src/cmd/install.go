@@ -17,7 +17,7 @@ var installCmd = &cobra.Command{
 	Short: "install a kubernetes cluster",
 	Long:  `install a kubernetes cluster`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("deploy called")
+		fmt.Println("install called")
 
 		path := args[0]
 		// Read the manifest file - should be the first argument
