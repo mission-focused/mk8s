@@ -28,12 +28,6 @@ var installCmd = &cobra.Command{
 		// Perform validation of the configuration
 		// This is likely a per-distribution function
 
-		// Download artifacts
-		err = distro.DownloadArtifacts(config)
-		if err != nil {
-			return err
-		}
-
 		// Install
 		err = distro.Install(config)
 		if err != nil {

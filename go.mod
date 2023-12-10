@@ -3,6 +3,7 @@ module github.com/brandtkeller/mk8s
 go 1.21.4
 
 require (
+	github.com/alexellis/k3sup v0.0.0-20231108155500-2bf2c9d94106
 	github.com/cheggaaa/pb/v3 v3.1.4
 	github.com/pkg/sftp v1.13.6
 	github.com/spf13/cobra v1.8.0
@@ -12,6 +13,7 @@ require (
 
 require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
+	github.com/alexellis/go-execute/v2 v2.0.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect

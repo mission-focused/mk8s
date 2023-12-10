@@ -1,5 +1,9 @@
 github.com/VividCortex/ewma v1.2.0 h1:f58SaIzcDXrSy3kWaHNvuJgJ3Nmz59Zji6XoJR/q1ow=
 github.com/VividCortex/ewma v1.2.0/go.mod h1:nz4BbCtbLyFDeC9SUHbtcT5644juEuWfUAUnGx7j5l4=
+github.com/alexellis/go-execute/v2 v2.0.0 h1:e2fB9kZcPG0yg65XHL1/t6efcCUdt32AMbr/mv7A2tc=
+github.com/alexellis/go-execute/v2 v2.0.0/go.mod h1:FMdRnUTiFAmYXcv23txrp3VYZfLo24nMpiIneWgKHTQ=
+github.com/alexellis/k3sup v0.0.0-20231108155500-2bf2c9d94106 h1:JRs/CJW1vkA/npEVX+kpt6lHcyV2gRdLxpyNAQmZiuE=
+github.com/alexellis/k3sup v0.0.0-20231108155500-2bf2c9d94106/go.mod h1:OliN4lAZr7v8q31L8Y0aLe/YNu37ikGUN0K6vYYqKKI=
 github.com/cheggaaa/pb/v3 v3.1.4 h1:DN8j4TVVdKu3WxVwcRKu0sG00IIU6FewoABZzXbRQeo=
 github.com/cheggaaa/pb/v3 v3.1.4/go.mod h1:6wVjILNBaXMs8c21qRiaUM8BR82erfgau1DQ4iUXmSA=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=

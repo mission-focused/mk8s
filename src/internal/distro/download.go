@@ -26,6 +26,24 @@ func DownloadArtifacts(config types.MultiConfig) error {
 
 }
 
+func ValidateArtifacts(config types.MultiConfig) (map[string]types.Artifact, error) {
+	artifacts, err := addDefaultArtifacts(config.Distro, config.Arch, config.Version, config.Artifacts)
+	if err != nil {
+		return nil, err
+	}
+
+	for id, artifact := range artifacts {
+
+		if exist, _ := dirOrFileExists("artifacts/" + artifact.Name); !exist {
+			return artifacts, fmt.Errorf("artifact %s is not present", id)
+		} else {
+			fmt.Println("Artifact", id, "is present")
+		}
+
+	}
+	return artifacts, nil
+}
+
 func downloadRKE2(arch, version string, artifacts map[string]types.Artifact) error {
 
 	allArtifacts, err := addDefaultArtifacts("rke2", arch, version, artifacts)
