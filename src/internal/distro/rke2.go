@@ -114,9 +114,15 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 			return err
 		}
 
-		installCmd := fmt.Sprintf("INSTALL_RKE2_ARTIFACT_PATH=%s INSTALL_RKE2_TYPE='%s' sudo sh %s", pwd+"/artifacts", node.Role, pwd+"/artifacts/install.sh")
+		installCmd := fmt.Sprintf("sudo INSTALL_RKE2_ARTIFACT_PATH=%s INSTALL_RKE2_TYPE='%s' sh %s", pwd+"/artifacts", node.Role, pwd+"/artifacts/install.sh")
 
 		err = common.ExecuteLocalCommand(installCmd)
+		if err != nil {
+			return err
+		}
+
+		systemctlCmd := fmt.Sprintf("sudo systemctl enable rke2-%s.service && sudo systemctl start rke2-%s.service", node.Role, node.Role)
+		err = common.ExecuteLocalCommand(systemctlCmd)
 		if err != nil {
 			return err
 		}
