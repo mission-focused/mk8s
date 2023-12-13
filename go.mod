@@ -1,4 +1,4 @@
-module github.com/brandtkeller/mk8s
+module github.com/mission-focused/mk8s
 
 go 1.21.4
 

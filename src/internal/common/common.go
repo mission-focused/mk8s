@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/brandtkeller/mk8s/src/types"
+	"github.com/mission-focused/mk8s/src/types"
 	"gopkg.in/yaml.v3"
 
 	"github.com/pkg/sftp"

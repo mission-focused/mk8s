@@ -6,8 +6,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/brandtkeller/mk8s/src/internal/common"
-	"github.com/brandtkeller/mk8s/src/internal/distro"
+	"github.com/mission-focused/mk8s/src/internal/common"
+	"github.com/mission-focused/mk8s/src/internal/distro"
 	"github.com/spf13/cobra"
 )
 
