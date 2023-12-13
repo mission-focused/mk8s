@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/brandtkeller/mk8s/src/internal/common"
-	"github.com/brandtkeller/mk8s/src/types"
+	"github.com/mission-focused/mk8s/src/internal/common"
+	"github.com/mission-focused/mk8s/src/types"
 )
 
 var (

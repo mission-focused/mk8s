@@ -3,7 +3,7 @@ package distro
 import (
 	"fmt"
 
-	"github.com/brandtkeller/mk8s/src/types"
+	"github.com/mission-focused/mk8s/src/types"
 )
 
 func Install(config types.MultiConfig) error {

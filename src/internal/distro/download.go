@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/brandtkeller/mk8s/src/types"
 	"github.com/cheggaaa/pb/v3"
+	"github.com/mission-focused/mk8s/src/types"
 )
 
 func DownloadArtifacts(config types.MultiConfig) error {
