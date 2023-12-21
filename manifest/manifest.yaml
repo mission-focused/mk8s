@@ -9,12 +9,12 @@ airgap: true # this is assumed for now
 
 ## Individual Node Configuration
 nodes:
-  - address: 192.168.1.100
-    user: ubuntu
+  - address: 192.168.1.61
+    user: dev
     role: server
     primary: true
     local: false
-    ssh_key_path: ~/.ssh/id_rsa
+    ssh_key_path: ~/.ssh/nopass
     ## Pass config file wholesale
     config: |
       write-kubeconfig-mode: "0644"
@@ -30,47 +30,47 @@ nodes:
       token: my-shared-secret
       node-taint:
         - "CriticalAddonsOnly=true:NoExecute"
-  - address: 192.168.1.101
-    user: ubuntu
-    role: server
-    primary: false
-    local: false
-    ssh_key_path: ~/.ssh/id_rsa
-    ## Pass config file wholesale
-    config: |
-      server: https://192.168.0.100:9345
-      write-kubeconfig-mode: "0644"
+  # - address: 192.168.1.101
+  #   user: ubuntu
+  #   role: server
+  #   primary: false
+  #   local: false
+  #   ssh_key_path: ~/.ssh/id_rsa
+  #   ## Pass config file wholesale
+  #   config: |
+  #     server: https://192.168.0.100:9345
+  #     write-kubeconfig-mode: "0644"
 
-      tls-san:
-        - k8s-test-2
-        - k8s-test-2.test.us
-        - test
-        - test.test.us
-      disable:
-        - rke2-ingress-nginx
-      disable-cloud-controller: true
-      token: my-shared-secret
-      node-taint:
-        - "CriticalAddonsOnly=true:NoExecute"
-  - address: 192.168.1.102
-    user: ubuntu
-    role: server
-    primary: false
-    local: false
-    ssh_key_path: ~/.ssh/id_rsa
-    ## Pass config file wholesale
-    config: |
-      # server: https://192.168.0.100:9345
-      write-kubeconfig-mode: "0644"
+  #     tls-san:
+  #       - k8s-test-2
+  #       - k8s-test-2.test.us
+  #       - test
+  #       - test.test.us
+  #     disable:
+  #       - rke2-ingress-nginx
+  #     disable-cloud-controller: true
+  #     token: my-shared-secret
+  #     node-taint:
+  #       - "CriticalAddonsOnly=true:NoExecute"
+  # - address: 192.168.1.102
+  #   user: ubuntu
+  #   role: server
+  #   primary: false
+  #   local: false
+  #   ssh_key_path: ~/.ssh/id_rsa
+  #   ## Pass config file wholesale
+  #   config: |
+  #     # server: https://192.168.0.100:9345
+  #     write-kubeconfig-mode: "0644"
 
-      tls-san:
-        - k8s-test-1
-        - k8s-test-1.test.us
-        - test
-        - test.test.us
-      disable:
-        - rke2-ingress-nginx
-      disable-cloud-controller: true
-      token: my-shared-secret
-      node-taint:
-        - "CriticalAddonsOnly=true:NoExecute"
+  #     tls-san:
+  #       - k8s-test-1
+  #       - k8s-test-1.test.us
+  #       - test
+  #       - test.test.us
+  #     disable:
+  #       - rke2-ingress-nginx
+  #     disable-cloud-controller: true
+  #     token: my-shared-secret
+  #     node-taint:
+  #       - "CriticalAddonsOnly=true:NoExecute"

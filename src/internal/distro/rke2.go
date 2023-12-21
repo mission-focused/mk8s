@@ -11,7 +11,8 @@ import (
 
 var (
 	createConfigDir  = "sudo mkdir -p /etc/rancher/rke2"
-	configDest       = "/etc/rancher/rke2/rke2.yaml"
+	artifactDir      = "~/rke2-artifacts"
+	configDest       = "/etc/rancher/rke2/config.yaml"
 	installExecution = ""
 )
 
@@ -72,24 +73,31 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 			PrivateKey: node.SshKeyPath,
 		}
 
-		// create /etc/rancher/rke2/ directory on the node
-		output, err := common.RunCommand(sshconfig, "sudo mkdir -p /etc/rancher/rke2")
-		if err != nil {
-			return err
-		}
-		fmt.Println(output)
-
-		// create the config file at /etc/rancher/rke2/config.yaml using the node config
-		err = common.CopyFileWithSSH(sshconfig, fileName, "/etc/rancher/rke2/config.yaml")
+		// Not expecting any result here
+		_, err := sshconfig.RunRemoteCommand(createConfigDir)
 		if err != nil {
 			return err
 		}
 
-		// TODO: check for existence of files on the node
-		// For now (given local testing) - we'll copy them
-		// TODO: do we need to create a new ssh session for each command? Or can we reuse the same session?
+		createArtifactDir := fmt.Sprintf("sudo mkdir -p %s", artifactDir)
+		_, err = sshconfig.RunRemoteCommand(createArtifactDir)
+		if err != nil {
+			return err
+		}
 
-		// TODO: Start Here - copy all artifacts from artifacts directory besides config files.
+		fmt.Println("Attempting to copy config file")
+		// Copy config file to rke2 directory
+		err = sshconfig.CopyFileWithSSH(fileName, "rke2-artifacts/"+ipString+"-config.yaml")
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("Attempting to move config file to final destination")
+		configMove := fmt.Sprintf("sudo cp %s %s", artifactDir+"/"+ipString+"-config.yaml", configDest)
+		_, err = sshconfig.RunRemoteCommand(configMove)
+		if err != nil {
+			return err
+		}
 
 	} else {
 		// Local installation - no ssh required
