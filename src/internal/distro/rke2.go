@@ -19,7 +19,7 @@ var (
 
 // TODO: maybe separate this to another package in the future
 
-// TODO: Here we can have more fun with concurrency in the future
+// TODO: Here we can have more fun with concurrency in the future. Start with each node serially to proof of concept
 func installMultiRKE2(config types.MultiConfig) (err error) {
 
 	// Likely we want to establish some concurrency here in the future
@@ -33,15 +33,33 @@ func installMultiRKE2(config types.MultiConfig) (err error) {
 		return err
 	}
 	// Prioritize installation on the primary node if identified
-	// TODO: future - then run the install on all other nodes simultaneously
+	// TODO: optimize this piece here - create a channel to signal completion of artifact transfer on each node
 	if _, ok := nodes["primary"]; ok {
 		// There should always only be one primary
 		err = installRKE2(nodes["primary"][0], artifacts)
 		if err != nil {
 			return err
 		}
+	}
 
-		// grab and alter the kubeconfig here for use immediately
+	// Primary Node installation complete - begin secondary nodes
+	if _, ok := nodes["server"]; ok {
+		for _, node := range nodes["server"] {
+			err = installRKE2(node, artifacts)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Secondary Server Node installation complete - begin agent nodes
+	if _, ok := nodes["agent"]; ok {
+		for _, node := range nodes["agent"] {
+			err = installRKE2(node, artifacts)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
@@ -80,7 +98,7 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 			return err
 		}
 
-		createArtifactDir := fmt.Sprintf("sudo mkdir -p %s", artifactDir)
+		createArtifactDir := fmt.Sprintf("mkdir -p %s", artifactDir)
 		_, err = sshconfig.RunRemoteCommand(createArtifactDir)
 		if err != nil {
 			return err
