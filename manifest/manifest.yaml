@@ -9,19 +9,19 @@ airgap: true # this is assumed for now
 
 ## Individual Node Configuration
 nodes:
-  - address: 192.168.1.100
-    user: ubuntu
+  - address: 192.168.1.71
+    user: dev
     role: server
     primary: true
     local: false
-    ssh_key_path: ~/.ssh/id_rsa
+    ssh_key_path: ~/.ssh/nopass
     ## Pass config file wholesale
     config: |
       write-kubeconfig-mode: "0644"
 
       tls-san:
-        - k8s-test-1
-        - k8s-test-1.test.us
+        - mk8s-test-1
+        - mk8s-test-1.test.us
         - test
         - test.test.us
       disable:
@@ -30,20 +30,20 @@ nodes:
       token: my-shared-secret
       node-taint:
         - "CriticalAddonsOnly=true:NoExecute"
-  - address: 192.168.1.101
-    user: ubuntu
+  - address: 192.168.1.72
+    user: dev
     role: server
     primary: false
     local: false
-    ssh_key_path: ~/.ssh/id_rsa
+    ssh_key_path: ~/.ssh/nopass
     ## Pass config file wholesale
     config: |
-      server: https://192.168.0.100:9345
+      server: https://192.168.1.71:9345
       write-kubeconfig-mode: "0644"
 
       tls-san:
-        - k8s-test-2
-        - k8s-test-2.test.us
+        - mk8s-test-2
+        - mk8s-test-2.test.us
         - test
         - test.test.us
       disable:
@@ -52,20 +52,20 @@ nodes:
       token: my-shared-secret
       node-taint:
         - "CriticalAddonsOnly=true:NoExecute"
-  - address: 192.168.1.102
-    user: ubuntu
+  - address: 192.168.1.73
+    user: dev
     role: server
     primary: false
     local: false
-    ssh_key_path: ~/.ssh/id_rsa
+    ssh_key_path: ~/.ssh/nopass
     ## Pass config file wholesale
     config: |
-      # server: https://192.168.0.100:9345
+      server: https://192.168.1.71:9345
       write-kubeconfig-mode: "0644"
 
       tls-san:
-        - k8s-test-1
-        - k8s-test-1.test.us
+        - mk8s-test-3
+        - mk8s-test-3.test.us
         - test
         - test.test.us
       disable:
@@ -74,3 +74,33 @@ nodes:
       token: my-shared-secret
       node-taint:
         - "CriticalAddonsOnly=true:NoExecute"
+  - address: 192.168.1.74
+    user: dev
+    role: agent
+    primary: false
+    local: false
+    ssh_key_path: ~/.ssh/nopass
+    ## Pass config file wholesale
+    config: |
+      server: https://192.168.1.71:9345
+      token: my-shared-secret
+  - address: 192.168.1.75
+    user: dev
+    role: agent
+    primary: false
+    local: false
+    ssh_key_path: ~/.ssh/nopass
+    ## Pass config file wholesale
+    config: |
+      server: https://192.168.1.71:9345
+      token: my-shared-secret
+  - address: 192.168.1.76
+    user: dev
+    role: agent
+    primary: false
+    local: false
+    ssh_key_path: ~/.ssh/nopass
+    ## Pass config file wholesale
+    config: |
+      server: https://192.168.1.71:9345
+      token: my-shared-secret

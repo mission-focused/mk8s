@@ -1,7 +1,9 @@
 # mk8s
 mk8s is a lightweight and portable tool for installing Kubernetes across many nodes with a focus on air-gap support. It uses a declarative manifest to define cluster nodes and their roles. It uses local or SSH access to perform the bootstrap and execution of Kubernetes processes with the intent of being extensible and flexible. 
 
-**Note:** This is merely an experiment at this point in time. All of this work is solely done in the open. Please leave comments or issues if you have any. 
+## ⚠️ Notice
+
+There is a lot of work still to be done on this project and we need your help. There will be many permutations across many systems across many Kubernetes distributions and if you find a scenario that is not supported - please leave an issue with as much information as you can.
 
 ## Why?
 Orchestrating the installation of Kubernetes clusters - whether connected or disconnected - across many nodes is often left to the operator (hence why this project exists). Cloud and Hypervisors have understood workflows for deploying clusters - but bare-metal and disconnected environments are often more complicated. What if we could reduce the dependency down to networked compute (linux). 

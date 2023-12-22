@@ -3,6 +3,7 @@ package distro
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mission-focused/mk8s/src/internal/common"
@@ -11,13 +12,14 @@ import (
 
 var (
 	createConfigDir  = "sudo mkdir -p /etc/rancher/rke2"
-	configDest       = "/etc/rancher/rke2/rke2.yaml"
+	artifactDir      = "~/rke2-artifacts"
+	configDest       = "/etc/rancher/rke2/config.yaml"
 	installExecution = ""
 )
 
 // TODO: maybe separate this to another package in the future
 
-// TODO: Here we can have more fun with concurrency in the future
+// TODO: Here we can have more fun with concurrency in the future. Start with each node serially to proof of concept
 func installMultiRKE2(config types.MultiConfig) (err error) {
 
 	// Likely we want to establish some concurrency here in the future
@@ -31,15 +33,33 @@ func installMultiRKE2(config types.MultiConfig) (err error) {
 		return err
 	}
 	// Prioritize installation on the primary node if identified
-	// TODO: future - then run the install on all other nodes simultaneously
+	// TODO: optimize this piece here - create a channel to signal completion of artifact transfer on each node
 	if _, ok := nodes["primary"]; ok {
 		// There should always only be one primary
 		err = installRKE2(nodes["primary"][0], artifacts)
 		if err != nil {
 			return err
 		}
+	}
 
-		// grab and alter the kubeconfig here for use immediately
+	// Primary Node installation complete - begin secondary nodes
+	if _, ok := nodes["server"]; ok {
+		for _, node := range nodes["server"] {
+			err = installRKE2(node, artifacts)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Secondary Server Node installation complete - begin agent nodes
+	if _, ok := nodes["agent"]; ok {
+		for _, node := range nodes["agent"] {
+			err = installRKE2(node, artifacts)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
@@ -72,25 +92,91 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 			PrivateKey: node.SshKeyPath,
 		}
 
-		// create /etc/rancher/rke2/ directory on the node
-		output, err := common.RunCommand(sshconfig, "sudo mkdir -p /etc/rancher/rke2")
-		if err != nil {
-			return err
-		}
-		fmt.Println(output)
-
-		// create the config file at /etc/rancher/rke2/config.yaml using the node config
-		err = common.CopyFileWithSSH(sshconfig, fileName, "/etc/rancher/rke2/config.yaml")
+		// Not expecting any result here
+		_, err := sshconfig.RunRemoteCommand(createConfigDir)
 		if err != nil {
 			return err
 		}
 
-		// TODO: check for existence of files on the node
-		// For now (given local testing) - we'll copy them
-		// TODO: do we need to create a new ssh session for each command? Or can we reuse the same session?
+		createArtifactDir := fmt.Sprintf("mkdir -p %s", artifactDir)
+		_, err = sshconfig.RunRemoteCommand(createArtifactDir)
+		if err != nil {
+			return err
+		}
 
-		// TODO: Start Here - copy all artifacts from artifacts directory besides config files.
+		fmt.Println("Attempting to copy config file")
+		// Copy config file to rke2 directory
+		err = sshconfig.CopyFileWithSSH(fileName, "rke2-artifacts/"+ipString+"-config.yaml")
+		if err != nil {
+			return err
+		}
 
+		fmt.Println("Attempting to move config file to final destination")
+		configMove := fmt.Sprintf("sudo cp %s %s", artifactDir+"/"+ipString+"-config.yaml", configDest)
+		_, err = sshconfig.RunRemoteCommand(configMove)
+		if err != nil {
+			return err
+		}
+
+		// TODO: implement some method to check if the file already exists on the remote AND the hash matches
+		// TODO: add a progress bar for the transfer process
+		for key, artifact := range artifacts {
+			if key == "images" {
+				fmt.Println("Transferring images - this make take some time....")
+			} else {
+				fmt.Printf("Transferring artifact: %s\n", key)
+			}
+
+			err = sshconfig.CopyFileWithSSH("artifacts/"+artifact.Name, "rke2-artifacts/"+artifact.Name)
+			if err != nil {
+				return err
+			}
+		}
+
+		fmt.Println("Running install script")
+
+		installCmd := fmt.Sprintf("sudo INSTALL_RKE2_ARTIFACT_PATH=%s INSTALL_RKE2_TYPE='%s' sh %s", "~/rke2-artifacts", node.Role, "~/rke2-artifacts/install.sh")
+		_, err = sshconfig.RunRemoteCommand(installCmd)
+		if err != nil {
+			return err
+		}
+
+		// Keeping this command separate with future intent on monitoring a channel for concurrency
+		fmt.Println("Enabling and Starting rke2 service")
+
+		enableStartCmd := fmt.Sprintf("sudo systemctl enable rke2-%s.service && sudo systemctl start rke2-%s.service", node.Role, node.Role)
+		_, err = sshconfig.RunRemoteCommand(enableStartCmd)
+		if err != nil {
+			return err
+		}
+
+		if node.Primary {
+			fmt.Println("Creating local copy of kubeconfig file")
+			// move kubeconfig file to location where we can copy it out without escalated privileges
+			res, err := sshconfig.RunRemoteCommand("sudo cat /etc/rancher/rke2/rke2.yaml")
+			if err != nil {
+				return err
+			}
+
+			path, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			absPath, _ := filepath.Abs(path)
+
+			kubeconfig := string(res.StdOut)
+			fmt.Printf("\nKubeconfig file: \n")
+			fmt.Println(kubeconfig)
+
+			config := strings.ReplaceAll(kubeconfig, "127.0.0.1", node.Address)
+
+			if err := os.WriteFile(absPath+"/rke2.yaml", []byte(config), 0600); err != nil {
+				return err
+			}
+
+		}
+
+		return nil
 	} else {
 		// Local installation - no ssh required
 
@@ -130,5 +216,4 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 		return nil
 	}
 
-	return nil
 }

@@ -5,9 +5,11 @@ go 1.21.4
 require (
 	github.com/alexellis/k3sup v0.0.0-20231108155500-2bf2c9d94106
 	github.com/cheggaaa/pb/v3 v3.1.4
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/sftp v1.13.6
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/crypto v0.16.0
+	golang.org/x/term v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
