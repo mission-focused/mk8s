@@ -3,6 +3,7 @@ package distro
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mission-focused/mk8s/src/internal/common"
@@ -99,6 +100,65 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 			return err
 		}
 
+		// TODO: implement some method to check if the file already exists on the remote AND the hash matches
+		// TODO: add a progress bar for the transfer process
+		for key, artifact := range artifacts {
+			if key == "images" {
+				fmt.Println("Transferring images - this make take some time....")
+			} else {
+				fmt.Printf("Transferring artifact: %s\n", key)
+			}
+
+			err = sshconfig.CopyFileWithSSH("artifacts/"+artifact.Name, "rke2-artifacts/"+artifact.Name)
+			if err != nil {
+				return err
+			}
+		}
+
+		fmt.Println("Running install script")
+
+		installCmd := fmt.Sprintf("sudo INSTALL_RKE2_ARTIFACT_PATH=%s INSTALL_RKE2_TYPE='%s' sh %s", "~/rke2-artifacts", node.Role, "~/rke2-artifacts/install.sh")
+		_, err = sshconfig.RunRemoteCommand(installCmd)
+		if err != nil {
+			return err
+		}
+
+		// Keeping this command separate with future intent on monitoring a channel for concurrency
+		fmt.Println("Enabling and Starting rke2 service")
+
+		enableStartCmd := fmt.Sprintf("sudo systemctl enable rke2-%s.service && sudo systemctl start rke2-%s.service", node.Role, node.Role)
+		_, err = sshconfig.RunRemoteCommand(enableStartCmd)
+		if err != nil {
+			return err
+		}
+
+		if node.Primary {
+			fmt.Println("Creating local copy of kubeconfig file")
+			// move kubeconfig file to location where we can copy it out without escalated privileges
+			res, err := sshconfig.RunRemoteCommand("sudo cat /etc/rancher/rke2/rke2.yaml")
+			if err != nil {
+				return err
+			}
+
+			path, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			absPath, _ := filepath.Abs(path)
+
+			kubeconfig := string(res.StdOut)
+			fmt.Printf("\nKubeconfig file: \n")
+			fmt.Println(kubeconfig)
+
+			config := strings.ReplaceAll(kubeconfig, "127.0.0.1", node.Address)
+
+			if err := os.WriteFile(absPath+"/rke2.yaml", []byte(config), 0600); err != nil {
+				return err
+			}
+
+		}
+
+		return nil
 	} else {
 		// Local installation - no ssh required
 
@@ -138,5 +198,4 @@ func installRKE2(node types.NodeConfig, artifacts map[string]types.Artifact) err
 		return nil
 	}
 
-	return nil
 }
