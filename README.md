@@ -10,10 +10,17 @@ Orchestrating the installation of Kubernetes clusters - whether connected or dis
 
 What if we could do this without the complexities of Ansible and have more granular capabilities and error handling to respond to events accordingly. Enter mk8s. 
 
+## Distro Support
+| Distribution | Supported |
+|--------------|-----------|
+| RKE2 | True |
+| K3S | False |
+
+## Inspiration
+- [RKE2](https://github.com/rancher/rke2)
+- [k3sup](https://github.com/alexellis/k3sup)
+
 ## Future Objectives
-- Concurrency
-  - Drive bootstrap to installation for many Kubernetes nodes simultaneously
-  - Reduce total time to High-availability 
 - Distro Support
   - Start with RKE2
   - Support K3s/Kubeadm in future builds
@@ -28,13 +35,6 @@ Concurrency
   - On signal from primary server ready - initiate all server nodes k8s processes to join
   - On signal from server nodes healthy - initiate all agent nodes 
 
-## Initial Build Phases
-
-Phase 1: manifest mockup - Done
-Phase 2: Pick a single distro and build a download command - Done
-Phase 3: Write functionality to copy artifacts to target
-Phase 4: Write functionality to bootstrap nodes
-Phase 5: Write functionality to install Kubernetes and check for health
 
 ## Potential Capabilities
 - Automated Artifact download
@@ -53,7 +53,3 @@ Phase 5: Write functionality to install Kubernetes and check for health
 
 - Error Handling
   - Retry logic where applicable
-
-## Where to start next
-- RKE2 download logic
-  - How to download the list of artifacts... 
