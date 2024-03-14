@@ -47,4 +47,4 @@ release:
     name: mk8s
   prerelease: auto
   mode: append
-  draft: false
+  draft: true
